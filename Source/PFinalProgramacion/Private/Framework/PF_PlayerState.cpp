@@ -2,7 +2,7 @@
 
 
 #include "Public/Framework/PF_PlayerState.h"
-
+#include "Framework/PF_GameState.h"
 #include "Net/UnrealNetwork.h"
 
 void APF_PlayerState::SetTeamColor(ETeam Team)
@@ -33,8 +33,14 @@ void APF_PlayerState::AddLoot(int32 SumaLoot)
 	
 	ValorTotalLoot += SumaLoot;
 	ItemsReclectados++;
+	
 	OnLootValueChanged.Broadcast(ValorTotalLoot);
 	OnItemsCollectedChanged.Broadcast(ItemsReclectados);
+	
+	if (APF_GameState* GS = GetWorld()->GetGameState<APF_GameState>())
+	{
+		GS->RecalcularPuntajeEquipo(TeamColor);
+	}
 
 }
 

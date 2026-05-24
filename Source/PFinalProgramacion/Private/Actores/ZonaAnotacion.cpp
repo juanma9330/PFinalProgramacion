@@ -2,8 +2,11 @@
 
 
 #include "Public/Actores/ZonaAnotacion.h"
-
+#include "Framework/PF_PlayerState.h"
+#include "Character/PF_Character.h"
 #include "Components/BoxComponent.h"
+#include "Items/ItemRobable.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -13,6 +16,7 @@ AZonaAnotacion::AZonaAnotacion()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	SetReplicates(true);
+	
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>("AreaPuntuacion");
 	BoxComponent->SetBoxExtent(FVector(300, 300, 300));
 	BoxComponent->SetHiddenInGame(false);
@@ -28,6 +32,18 @@ void AZonaAnotacion::BeginPlay()
 	BoxComponent->MarkRenderStateDirty();
 }
 
+bool AZonaAnotacion::PuedeEntregarLoot(APF_Character* Character) const
+{
+	if (!bZonaExclusiva) return true;
+	
+	if (const APF_PlayerState* PS = Character->GetPlayerState<APF_PlayerState>())
+	{
+		return PS->GetTeamColor() == EquipoAsignado;
+	}
+	return false;
+}
+
+
 // Called every frame
 void AZonaAnotacion::Tick(float DeltaTime)
 {
@@ -37,10 +53,63 @@ void AZonaAnotacion::Tick(float DeltaTime)
 void AZonaAnotacion::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
+	if (!OtherActor) return;
+	if (!HasAuthority()) return;
+	
+	APF_Character* Character = Cast<APF_Character>(OtherActor);
+	if (!Character) return;
+	
+	JugadoresEnZona.AddUnique(Character);
+	
+	Server_Puntuar(Character);
+	
 }
 
 void AZonaAnotacion::NotifyActorEndOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorEndOverlap(OtherActor);
+	if (!OtherActor) return;
+	if (!HasAuthority()) return;
+	
+	APF_Character* Character = Cast<APF_Character>(OtherActor);
+	if (!Character) return;
+	
+	JugadoresEnZona.Remove(Character);
+	
 }
 
+void AZonaAnotacion::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AZonaAnotacion, JugadoresEnZona);
+}
+
+
+
+void AZonaAnotacion::Server_Puntuar_Implementation(APF_Character* Character)
+{
+	if (!Character) return;
+	if (!PuedeEntregarLoot(Character)) return;
+	
+	APF_PlayerState* PS=Character->GetPlayerState<APF_PlayerState>();
+	if (!PS) return;
+	
+	TArray<AActor*> AttachedActors;
+	Character->GetAttachedActors(AttachedActors);
+	
+	int32 LootEntregado = 0;
+	
+	for (AActor* Actor : AttachedActors)
+	{
+		if (AItemRobable* Item =Cast<AItemRobable>(Actor))
+		{
+			LootEntregado+=Item->GetValor();
+			Item ->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			Item ->Destroy();
+		
+			PS->AddLoot(LootEntregado);
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green,FString::Printf(TEXT("%s entrego: %d | Total: %d"),
+				*PS->GetPlayerName(),LootEntregado,PS->GetValorTotalLoot()));
+		}
+	}
+}

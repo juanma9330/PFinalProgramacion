@@ -7,7 +7,9 @@
 #include "InputMappingContext.h"
 #include "Blueprint/UserWidget.h"
 #include "PFinalProgramacion.h"
+#include "UI/CharacterHud.h"
 #include "Widgets/Input/SVirtualJoystick.h"
+
 
 void APFinalProgramacionPlayerController::BeginPlay()
 {
@@ -30,6 +32,14 @@ void APFinalProgramacionPlayerController::BeginPlay()
 
 		}
 
+	}
+	if (IsLocalPlayerController() && HUDWidgetClass)
+	{
+		HUDWidget =CreateWidget<UCharacterHud>(this, HUDWidgetClass);
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
+		}
 	}
 }
 

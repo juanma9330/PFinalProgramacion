@@ -7,7 +7,8 @@
 #include "PFinalProgramacionPlayerController.generated.h"
 
 class UInputMappingContext;
-class UUserWidget;
+class UCharacterHud;
+
 
 /**
  *  Basic PlayerController class for a third person game
@@ -17,6 +18,11 @@ UCLASS(abstract)
 class APFinalProgramacionPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	
+	UFUNCTION(BlueprintPure, Category = "HUD")
+	UCharacterHud* GetCharacterHud() const{ return HUDWidget; }
 	
 protected:
 
@@ -32,13 +38,21 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input|Touch Controls")
 	TSubclassOf<UUserWidget> MobileControlsWidgetClass;
 
+
+		
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD")
+	TSubclassOf<UCharacterHud> HUDWidgetClass;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "HUD")
+	TObjectPtr<UCharacterHud> HUDWidget;
+	
+	
 	/** Pointer to the mobile controls widget */
 	TObjectPtr<UUserWidget> MobileControlsWidget;
-
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
 
 	/** Input mapping context setup */
 	virtual void SetupInputComponent() override;
-
+	
 };

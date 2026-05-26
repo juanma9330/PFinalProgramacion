@@ -86,7 +86,7 @@ void AItemRobable::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& O
 
 void AItemRobable::OnRep_Recogido()
 {
-	if (!bRecogido)
+	if (bRecogido)
 	{
 		DesactivarColision();
 	}
@@ -109,7 +109,7 @@ void AItemRobable::EjecutarPickup(AActor* Interactor)
 	{
 		if (APF_PlayerState* PS = Character->GetPlayerState<APF_PlayerState>())
 			{
-			PS->AddLoot(ValorItem);
+			//PS->AddLoot(ValorItem);
 			}
 	}
 }

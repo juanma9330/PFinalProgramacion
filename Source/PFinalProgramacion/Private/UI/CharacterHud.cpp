@@ -20,7 +20,7 @@ void UCharacterHud::NativeOnInitialized()
 		GS->OnPuntajeEquipoChanged.AddDynamic(this, &UCharacterHud::OnPuntajeEquipoChanged);
 		
 		SetScoreAzulText(GS->GetPuntajeEquipo(ETeam::Blue));
-		SetScoreAzulText(GS->GetPuntajeEquipo(ETeam::Red));
+		SetScoreRojoText(GS->GetPuntajeEquipo(ETeam::Red));
 
 	}
 }

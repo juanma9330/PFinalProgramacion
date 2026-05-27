@@ -19,14 +19,42 @@ APF_GameState::APF_GameState()
 
 void APF_GameState::StartMatch(float Duracion)
 {
+	if (!HasAuthority()) return;
+	TiempoRestante = Duracion;
+	OnRep_TiempoRestante();
+	
+	GetWorldTimerManager().SetTimer(RelojPartidaTimerHandle,this, &APF_GameState::ActualizarReloj, 1.0f,true);
+	
 }
 
-void APF_GameState::SetGameOver(APF_PlayerState* Ganador)
+void APF_GameState::SetGameOver(ETeam EquipoGanador)
 {
+	if (!HasAuthority()) return;
+	GanadorPartida = EquipoGanador;
+	OnRep_GanadorPartida();
 }
 
-void APF_GameState::OnRep_RemainingTime()
+void APF_GameState::SetTiempoInicial(float TiempoInicial)
 {
+	if (HasAuthority())
+	{
+		TiempoRestante = TiempoInicial;
+		OnRep_TiempoRestante();
+	}
+}
+
+void APF_GameState::OnRep_TiempoRestante()
+{
+	OnTiempoRestanteChanged.Broadcast(TiempoRestante);
+}
+
+void APF_GameState::ActualizarReloj()
+{
+	if (TiempoRestante > 0)
+	{
+		TiempoRestante --;
+		OnTiempoRestanteChanged.Broadcast(TiempoRestante);
+	}
 }
 
 void APF_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -34,7 +62,8 @@ void APF_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(APF_GameState, PuntajeEquipoAzul);
 	DOREPLIFETIME(APF_GameState, PuntajeEquipoRojo);
-
+	DOREPLIFETIME(APF_GameState, TiempoRestante);
+	DOREPLIFETIME(APF_GameState, GanadorPartida);
 }
 
 void APF_GameState::RecalcularPuntajeEquipo(ETeam Equipo)
@@ -80,4 +109,11 @@ void APF_GameState::OnRep_PuntajeAzul()
 void APF_GameState::OnRep_PuntajeRojo()
 {
 	OnPuntajeEquipoChanged.Broadcast(ETeam::Red, PuntajeEquipoRojo);
+}
+
+void APF_GameState::OnRep_GanadorPartida()
+{
+	OnGanadorName.Broadcast(GanadorPartida);
+	
+	
 }

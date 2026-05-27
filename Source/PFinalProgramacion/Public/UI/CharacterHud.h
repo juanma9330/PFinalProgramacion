@@ -33,7 +33,7 @@ public:
 	void SetTiempo(int32 TiempoPartida);
 	
 	UFUNCTION(BlueprintCallable, Category = "HUD")
-	void SetEquipoGanador(FString EquipoGanador);
+	void SetEquipoGanador(ETeam EquipoGanador);
 	
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void MostrarPromptItem(bool bMostrar, FString NombreItem = "");

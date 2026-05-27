@@ -17,6 +17,7 @@ class PFINALPROGRAMACION_API APF_GameMode : public AGameMode
 	
 public:	
 	APF_GameMode();
+	
 	virtual void StartMatch() override;
 	virtual void BeginPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
@@ -24,8 +25,10 @@ public:
 		
 	void CheckWinCondition();
 	void DeclareWinner();
-	
 
+	UFUNCTION()
+	void TerminotiempoPartida();
+	
 	//----------TIEMPOS----------------
 	//tiempo de espra para iniciar partida
 	FTimerHandle TiempoEsperaInicioTimerHandle;
@@ -39,22 +42,9 @@ public:
 	UPROPERTY(EditDefaultsOnly,Category= "GameMode")
 	float DuracionPartida;
 	
-		// timer DuracionPartidaHandle de la partida llega a cero
-//UFUNCTION()
-//	void TerminotiempoPartida();
+	FTimerHandle ExpulsarJugadoresTimerHandle;
+	void ExpulsarJugadores();
 	
-
-	
-//	void ZonaPuntuacion();
-	
-	//UPROPERTY(BlueprintReadOnly,Category= "GameMode")
-//	TArray<TObjectPtr<AZonaAnotacion>> ZonaParaPuntuar;
-
-	
-	
-
-	
-	
-	
-	
+	UPROPERTY(EditDefaultsOnly,Category= "GameMode")
+	float TiempoPostPartida;
 };

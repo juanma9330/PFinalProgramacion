@@ -105,13 +105,7 @@ void AItemRobable::EjecutarPickup(AActor* Interactor)
 	DesactivarColision();
 	
 	SetOwner(Interactor);
-	if (ACharacter* Character = Cast<ACharacter>(Interactor))
-	{
-		if (APF_PlayerState* PS = Character->GetPlayerState<APF_PlayerState>())
-			{
-			//PS->AddLoot(ValorItem);
-			}
-	}
+	
 }
 
 void AItemRobable::DesactivarColision()

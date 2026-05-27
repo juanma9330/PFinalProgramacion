@@ -28,7 +28,7 @@ public:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	void CheckPuntuar();
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Zona")
 	bool bZonaExclusiva = false;
@@ -51,7 +51,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditAnywhere,blueprintReadWrite,Category="Zona", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere,blueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UBoxComponent>BoxComponent;
 	
 	UPROPERTY(Replicated)

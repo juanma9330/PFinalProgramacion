@@ -107,9 +107,13 @@ void AZonaAnotacion::Server_Puntuar_Implementation(APF_Character* Character)
 			Item ->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 			Item ->Destroy();
 		
-			PS->AddLoot(LootEntregado);
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green,FString::Printf(TEXT("%s entrego: %d | Total: %d"),
-				*PS->GetPlayerName(),LootEntregado,PS->GetValorTotalLoot()));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green,FString::Printf(TEXT("%s entrego: %d | Total: %d"),
+			//	*PS->GetPlayerName(),LootEntregado,PS->GetValorTotalLoot()));
 		}
 	}
+	if (LootEntregado > 0)
+	{
+		PS->AddLoot(LootEntregado);
+	}
+		
 }

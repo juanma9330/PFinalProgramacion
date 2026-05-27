@@ -18,9 +18,13 @@ void UCharacterHud::NativeOnInitialized()
 	if (APF_GameState* GS = GetWorld()->GetGameState<APF_GameState>())
 	{
 		GS->OnPuntajeEquipoChanged.AddDynamic(this, &UCharacterHud::OnPuntajeEquipoChanged);
-		
+		GS->OnGanadorName.AddDynamic(this, &UCharacterHud::SetEquipoGanador);
+				
 		SetScoreAzulText(GS->GetPuntajeEquipo(ETeam::Blue));
 		SetScoreRojoText(GS->GetPuntajeEquipo(ETeam::Red));
+		SetTiempo(GS->GetTiempoRestante());
+		
+		GS->OnTiempoRestanteChanged.AddDynamic(this, &UCharacterHud::SetTiempo);
 
 	}
 }
@@ -52,8 +56,32 @@ void UCharacterHud::SetTiempo(int32 TiempoPartida)
 	}
 }
 
-void UCharacterHud::SetEquipoGanador(FString EquipoGanador)
+void UCharacterHud::SetEquipoGanador(ETeam EquipoGanador)
 {
+	if (!GanadorText) return;
+	
+	FString TextoGanador;
+	FSlateColor ColorTexto;
+
+	if (EquipoGanador == ETeam::Blue)
+	{
+		TextoGanador = "VICTORIA DEL EQUIPO AZUL!";
+		ColorTexto = FSlateColor(FLinearColor::Blue);
+	}
+	else if (EquipoGanador == ETeam::Red)
+	{
+		TextoGanador = "VICTORIA DEL EQUIPO ROJO!";
+		ColorTexto = FSlateColor(FLinearColor::Red);
+	}
+	else
+	{
+		TextoGanador = "EMPATE!";
+		ColorTexto = FSlateColor(FLinearColor::White);
+	}
+
+	GanadorText->SetText(FText::FromString(TextoGanador));
+	GanadorText->SetColorAndOpacity(ColorTexto);
+	GanadorText->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UCharacterHud::MostrarPromptItem(bool bMostrar, FString NombreItem)
